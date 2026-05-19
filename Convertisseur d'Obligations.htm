@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr"><head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convertisseur d'Obligations</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            min-height: 100vh;
+            padding: 30px 15px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 35px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+
+        header p {
+            color: #a8d8ea;
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            font-size: 1.2rem;
+            color: #203a43;
+            margin-bottom: 25px;
+            border-left: 4px solid #2c5364;
+            padding-left: 12px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="number"] {
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: #2c5364;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .radio-option {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .radio-option:hover {
+            border-color: #2c5364;
+            background: #f0f7ff;
+        }
+
+        .radio-option input[type="radio"] {
+            accent-color: #2c5364;
+            width: 18px;
+            height: 18px;
+        }
+
+        .radio-option span {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .btn-submit {
+            grid-column: 1 / -1;
+            padding: 14px;
+            background: linear-gradient(135deg, #203a43, #2c5364);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .error-box {
+            background: #fff0f0;
+            border: 1px solid #ffcccc;
+            color: #cc0000;
+            padding: 12px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 0.95rem;
+        }
+
+        /* Résultats */
+        .resultats-header {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #dee2e6;
+        }
+
+        .stat-box .label {
+            font-size: 0.78rem;
+            color: #777;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .stat-box .valeur {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #203a43;
+        }
+
+        .stat-box.highlight {
+            background: linear-gradient(135deg, #203a43, #2c5364);
+            border: none;
+        }
+
+        .stat-box.highlight .label {
+            color: #a8d8ea;
+        }
+
+        .stat-box.highlight .valeur {
+            color: #fff;
+        }
+
+        /* Tableau */
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid #e0e0e0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        thead {
+            background: linear-gradient(135deg, #203a43, #2c5364);
+            color: white;
+        }
+
+        thead th {
+            padding: 14px 16px;
+            text-align: right;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        thead th:first-child {
+            text-align: center;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.15s;
+        }
+
+        tbody tr:hover {
+            background: #f5faff;
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            background: #f0f7ff;
+        }
+
+        tbody td {
+            padding: 12px 16px;
+            text-align: right;
+            color: #444;
+        }
+
+        tbody td:first-child {
+            text-align: center;
+            font-weight: 600;
+            color: #203a43;
+        }
+
+        .interet-cell {
+            color: #1a7a4a;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .resultats-header {
+                grid-template-columns: 1fr;
+            }
+            .radio-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Convertisseur d'Obligations</h1>
+            <p>Transformez une obligation classique en obligation zéro coupon</p>
+        </header>
+
+        <!-- Formulaire -->
+        <div class="card">
+            <h2>Paramètres de l'obligation</h2>
+
+            
+
+            <form method="POST">
+                <input type="hidden" name="csrfmiddlewaretoken" value="LvYwXmFH2PLVniuOgd5LkD36p0iTxzN1jiwD0cElEuu016HxDETLaj6c4VLxRya5">
+                <div class="form-grid">
+
+                    <div class="form-group">
+                        <label>Valeur nominale (montant)</label>
+                        <input type="number" name="montant" placeholder="Ex : 100000" value="1000000000.0" min="1" step="any" required="">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Taux d'intérêt (%)</label>
+                        <input type="number" name="taux" placeholder="Ex : 5.5" value="5.5" min="0.01" step="any" required="">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Type de taux</label>
+                        <div class="radio-group">
+                            <label class="radio-option">
+                                <input type="radio" name="type_taux" value="annuel" checked="checked">
+                                <span>📅 Annuel</span>
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="type_taux" value="mensuel">
+                                <span>🗓️ Mensuel</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Durée (nombre de périodes)</label>
+                        <input type="number" name="duree" placeholder="Ex : 5" value="5" min="1" step="1" required="">
+                    </div>
+
+                    <button type="submit" class="btn-submit">⚙️ Calculer la conversion</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Résultats -->
+        
+        <div class="card">
+            <h2>Résultats de la conversion</h2>
+
+            <div class="resultats-header">
+                <div class="stat-box">
+                    <div class="label">Valeur nominale</div>
+                    <div class="valeur">1000000000.00 FCFA</div>
+                </div>
+                <div class="stat-box highlight">
+                    <div class="label">Prix d'émission (VA)</div>
+                    <div class="valeur">765134353.84 FCFA</div>
+                </div>
+                <div class="stat-box">
+                    <div class="label">Intérêts totaux perçus</div>
+                    <div class="valeur">234865646.16 FCFA</div>
+                </div>
+            </div>
+
+            <h2>Tableau des intérêts — Année par Année</h2>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Année</th>
+                            <th>Capital début de période</th>
+                            <th>Intérêts de la période</th>
+                            <th>Capital fin de période</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+                        <tr>
+                            <td>1</td>
+                            <td>765134353.84</td>
+                            <td class="interet-cell">+ 42082389.46</td>
+                            <td>807216743.30</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>2</td>
+                            <td>807216743.30</td>
+                            <td class="interet-cell">+ 44396920.88</td>
+                            <td>851613664.18</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>3</td>
+                            <td>851613664.18</td>
+                            <td class="interet-cell">+ 46838751.53</td>
+                            <td>898452415.71</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>4</td>
+                            <td>898452415.71</td>
+                            <td class="interet-cell">+ 49414882.86</td>
+                            <td>947867298.58</td>
+                        </tr>
+                        
+                        <tr>
+                            <td>5</td>
+                            <td>947867298.58</td>
+                            <td class="interet-cell">+ 52132701.42</td>
+                            <td>1000000000.00</td>
+                        </tr>
+                        
+                        <tr>
+                            <td colspan="2">TOTAL</td>
+                            <td class="interet-cell">+ 234865646.16</td>
+                            <td>1000000000.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+
+    </div>
+
+
+</body></html>
